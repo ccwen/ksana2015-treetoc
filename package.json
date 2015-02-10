@@ -1,0 +1,19 @@
+{
+  "name": "ksana2015-treetoc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ksanaforge/ksana2015-treetoc"
+  },
+  "author": "yapcheahshen@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ksanaforge/ksana2015-treetoc/issues"
+  },
+  "homepage": "https://github.com/ksanaforge/ksana2015-treetoc"
+}

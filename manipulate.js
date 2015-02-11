@@ -1,14 +1,25 @@
+var lastChild=function(n,toc) {
+	var d=toc[n].d;
+	n++;
+	while (n<toc.length) {
+		if (toc[n].d<=d) return n;
+		n++;
+	}
+	return toc.length-1;
+}
 var levelup =function(sels,toc) { //move select node and descendants one level up
 	if (!canLevelup(sels,toc))return;
 	var n=sels[0];
 	var cur=toc[n];
 	var next=toc[n+1];
-	cur.d--;
+	var nextsib=cur.n||lastChild(n,toc);
 	if (next && next.d>cur.d) { //has child
-		for (var i=n+1;i<cur.n;i++) {
+		for (var i=n+1;i<nextsib;i++) {
 			toc[i].d--;
 		}
 	}
+	cur.d--;
+	cur.o=true;//force open this node , so that sibling is visible
 	return true;
 }
 var leveldown =function(sels,toc) {
@@ -21,12 +32,12 @@ var leveldown =function(sels,toc) {
 	var p=prevSibling(n,toc);
 	if (p) toc[p].o=true;
 
-	cur.d++;
 	if (next && next.d>cur.d) { //has child
 		for (var i=n+1;i<cur.n;i++) {
 			toc[i].d++;
 		}
 	}
+	cur.d++;
 	return true;
 }
 var moveup =function(sel,toc) {

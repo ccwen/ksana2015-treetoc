@@ -75,7 +75,7 @@ var TreeNode=React.createClass({
 		}
 
 		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur);
-		var caption=E("span",{className:selected+" caption"},cur.t);
+		var caption=E("span",{className:selected+" caption",title:n},cur.t);
 		if (this.props.editcaption===n) {
 			caption=E("input",{onKeyPress:this.keypress,className:"",ref:"editcaption",defaultValue:cur.t});
 			extracomponent=null;

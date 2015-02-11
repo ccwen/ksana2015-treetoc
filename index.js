@@ -48,7 +48,7 @@ var TreeToc=React.createClass({
 		var act=args.shift();
 		var p1=args[0];
 		var p2=args[1];
-		var firstsel=this.state.selected[0];
+		var sels=this.state.selected;
 		var toc=this.props.data;
 		var r=false;
 		if (act==="updateall") {
@@ -69,12 +69,10 @@ var TreeToc=React.createClass({
 			if (n>0) selected.push(n);
 			var enabled=manipulate.enabled(selected,toc);
 			this.setState({selected:selected,editcaption:-1,enabled:enabled});
-		} else if (act==="levelup") r=manipulate.levelup(this.state.selected,toc);
-		else if (act==="leveldown") r=manipulate.leveldown(this.state.selected,toc);
-		else if (act==="moveup") r=manipulate.moveup(firstsel,toc);
-		else if (act==="movedown") r=manipulate.movedown(firstsel,toc);
-		else if (act==="add") r=manipulate.addnode(firstsel,toc);
-		else if (act==="remove") r=manipulate.removenode(firstsel,toc);
+		} else if (act==="levelup") r=manipulate.levelup(sels,toc);
+		else if (act==="leveldown") r=manipulate.leveldown(sels,toc);
+		else if (act==="add") r=manipulate.addnode(sels,toc);
+		else if (act==="remove") r=manipulate.removenode(sels,toc);
 		if (r) {
 			buildToc(toc);
 			var enabled=manipulate.enabled(this.state.selected,this.props.data);

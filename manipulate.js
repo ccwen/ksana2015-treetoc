@@ -23,7 +23,7 @@ var levelup =function(sels,toc) { //move select node and descendants one level u
 	return true;
 }
 var leveldown =function(sels,toc) {
-	if (!canLeveldown(sels,toc))return; //move select node and descendants one level down
+	if (!canLeveldown(sels,toc))return; //move select node descendants one level down
 	var n=sels[0];
 	var cur=toc[n];
 	var next=toc[n+1];
@@ -32,33 +32,26 @@ var leveldown =function(sels,toc) {
 	var p=prevSibling(n,toc);
 	if (p) toc[p].o=true;
 
-	if (next && next.d>cur.d) { //has child
-		for (var i=n+1;i<cur.n;i++) {
-			toc[i].d++;
-		}
+	if (!cur.o) { //do no move descendants if opened
+		if (next && next.d>cur.d) { //has child
+			for (var i=n+1;i<cur.n;i++) {
+				toc[i].d++;
+			}
+		}		
 	}
 	cur.d++;
 	return true;
 }
-var moveup =function(sel,toc) {
+
+var add =function(sels,toc) {
 	
 }
-var movedown =function(sel,toc) {
-	
-}
-var add =function(sel,toc) {
-	
-}
-var remove =function(sel,toc) {
+var remove =function(sels,toc) {
 	
 }
 var canAdd=function(sels,toc) {
 }
 var canRemove=function(sels,toc) {
-}
-var canMoveup=function(sels,toc) {
-}
-var canMovedown=function(sels,toc) {
 }
 var canLevelup=function(sels,toc) {
 	if (sels.length==0) return false;
@@ -83,10 +76,8 @@ var enabled=function(sels,toc) {
 	var enabled=[];
 	if (canLeveldown(sels,toc)) enabled.push("leveldown");
 	if (canLevelup(sels,toc)) enabled.push("levelup");
-	if (canMoveup(sels,toc)) enabled.push("moveup");
-	if (canMovedown(sels,toc)) enabled.push("movedown");
 	if (canAdd(sels,toc)) enabled.push("add");
 	if (canRemove(sels,toc)) enabled.push("remove");
 	return enabled;
 }
-module.exports={enabled:enabled,levelup:levelup,leveldown:leveldown,moveup:moveup,movedown:movedown,add:add,remove:remove};
+module.exports={enabled:enabled,levelup:levelup,leveldown:leveldown,add:add,remove:remove};

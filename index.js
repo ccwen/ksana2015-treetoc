@@ -5,150 +5,28 @@
    only first level can be 0
 */
 var React=require("react");
+var TreeNode=require("./treenode");
+var Controls=require("./controls");
 var E=React.createElement;
-var TreeToc=React.createClass({
-	propTypes:{
-		data:React.PropTypes.array.isRequired
-		,cur:React.PropTypes.number.isRequired
-	}
-	,getDefaultProps:function() {
-		return {cur:0};
-	}
-	,renderItem:function(e,idx){
-		var t=this.props.data[e];
-		return E(TreeToc,{key:"k"+idx,cur:e,data:this.props.data,opts:this.props.opts});
-	}
-	,click:function(e) {
-		var n=parseInt(e.target.parentElement.attributes['data-n'].value);
-		this.props.data[n].o=!this.props.data[n].o;
-		this.forceUpdate();
-		e.preventDefault();
-        e.stopPropagation();
-	}
-	,clearSelected:function() {
-		for (var i=0;i<this.props.data.length;i++) {
-			if (this.props.data[i].s) (this.props.data[i].s)=false;
-		}
-	}
-	,findRoot:function() { //this is not good
-		var root=this;
-		while (root._owner && typeof root.props.cur!="undefined") {
-			if (root.props.cur!==0) root=root._owner;
-			else break;
-		}
-		return root;
-	}
-	,select:function(e){
-		var n=parseInt(e.target.parentElement.attributes['data-n'].value);
-		var s=!this.props.data[n].s;
-		if (!e.ctrlKey) this.clearSelected();
-		this.props.data[n].s=s;
-		var root=this.findRoot();
-		root.forceUpdate();
-		e.preventDefault();
-        e.stopPropagation();
-	}
-	,render:function() {
-		var cur=this.props.data[this.props.cur];
-		var opened="",selected="",extra="",children=[];
-		var folderbutton=null;
-		var depthdeco=renderDepth(cur.d,this.props.opts)
-		if (cur.d==0) extra=" treetoc";
-		if (cur.s) selected=" selected";
-		if (cur.c) { 
-			if (cur.o) {
-				opened=" opened";
-				children=enumChildren(this.props.data,this.props.cur);
-				folderbutton=E("button",{onClick:this.click},"－");
-			}
-			else {
-				folderbutton=E("button",{onClick:this.click},"＋");
-				opened=" closed";
-			}
-		} else {
-			folderbutton=E("span",{},"　　");
-		}
+var manipulate=require("./manipulate");
 
-		return E("div",{onClick:this.select,"data-n":this.props.cur,className:"childnode"+opened+extra},
-			   folderbutton,depthdeco,
-			   E("span",{className:selected},cur.t),
-			   	children.map(this.renderItem));
-	}
-});
-var ganzhi="　甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥";
-
-var renderDepth=function(depth,opts) {
-  var out=[];
-  if (opts&&opts.tocstyle=="ganzhi") {
-    return E("span", null, ganzhi[depth].trim()+" ");
-  } else {
-    if (depth) return E("span", null, depth, ".")
-    else return null;
-  }
-  return null;
-};
 var buildToc = function(toc) {
 	if (!toc || !toc.length) return;  
 	var depths=[];
  	var prev=0;
  	if (toc.length>1) {
- 		toc[0].c=true;
  		toc[0].o=true;//opened
  	}
+ 	for (var i=0;i<toc.length;i++) delete toc[i].n;
 	for (var i=0;i<toc.length;i++) {
 	    var depth=toc[i].d||toc[i].depth;
 	    if (prev>depth) { //link to prev sibling
 	      if (depths[depth]) toc[depths[depth]].n = i;
 	      for (var j=depth;j<prev;j++) depths[j]=0;
 	    }
-	    if (i<toc.length-1 && (toc[i+1].d||toc[i+1].depth)>depth) {
-	      toc[i].c=true;
-	    }
     	depths[depth]=i;
     	prev=depth;
 	}
-}
-var enumAncestors=function(toc,cur) {
-    if (!toc || !toc.length) return;
-    if (cur==0) return [];
-    var n=cur-1;
-    var depth=toc[cur].d||toc[cur].depth - 1;
-    var parents=[];
-    while (n>=0 && depth>0) {
-      if (toc[n].d||toc[n].depth==depth) {
-        parents.unshift(n);
-        depth--;
-      }
-      n--;
-    }
-    parents.unshift(0); //first ancestor is root node
-    return parents;
-}
-
-var enumChildren=function(toc,cur) {
-    var children=[];
-    if (!toc || !toc.length || toc.length==1) return children;
-    thisdepth=toc[cur].d||toc[cur].depth;
-    if (cur==0) thisdepth=0;
-    if (cur+1>=toc.length) return children;
-    if ((toc[cur+1].d||toc[cur+1].depth)!= 1+thisdepth) {
-    	return children;  // no children node
-    }
-    var n=cur+1;
-    var child=toc[n];
-    
-    while (child) {
-      children.push(n);
-      var next=toc[n+1];
-      if (!next) break;
-      if ((next.d||next.depth)==(child.d||child.depth)) {
-        n++;
-      } else if ((next.d||next.depth)>(child.d||child.depth)) {
-        n=child.n||child.next;
-      } else break;
-      if (n) child=toc[n];else break;
-    }
-    return children;
 }
 var genToc=function(toc,title) {
     var out=[{depth:0,text:title||ksana.js.title}];
@@ -157,4 +35,60 @@ var genToc=function(toc,title) {
     }
     return out; 
 }
-module.exports={component:TreeToc,genToc:genToc,enumChildren:enumChildren,enumAncestors:enumAncestors,buildToc:buildToc};
+var TreeToc=React.createClass({
+	propTypes:{
+		data:React.PropTypes.array.isRequired
+		,opts:React.PropTypes.object
+	}
+	,getInitialState:function(){
+		return {editcaption:-1,selected:[],enabled:[]};
+	}
+	,action:function() {
+		var args=Array.prototype.slice.apply(arguments);
+		var act=args.shift();
+		var p1=args[0];
+		var p2=args[1];
+		var firstsel=this.state.selected[0];
+		var toc=this.props.data;
+		var r=false;
+		if (act==="updateall") {
+			this.setState({editcaption:-1});
+		} else if (act==="editcaption") {
+			this.setState({editcaption:parseInt(p1),enabled:[]});
+		} else if (act==="changecaption") {
+			if (!this.state.editcaption===-1) return;
+			this.props.data[this.state.editcaption].t=p1;
+			var enabled=manipulate.enabled(this.state.selected,this.props.data);
+			this.setState({editcaption:-1,enabled:enabled});
+		} else if (act==="select") {
+			var selected=this.state.selected;
+			if (!(this.props.opts.multiselect && p2)) {
+				selected=[];
+			}
+			var n=parseInt(p1);
+			if (n>0) selected.push(n);
+			var enabled=manipulate.enabled(selected,toc);
+			this.setState({selected:selected,editcaption:-1,enabled:enabled});
+		} else if (act==="levelup") r=manipulate.levelup(this.state.selected,toc);
+		else if (act==="leveldown") r=manipulate.leveldown(this.state.selected,toc);
+		else if (act==="moveup") r=manipulate.moveup(firstsel,toc);
+		else if (act==="movedown") r=manipulate.movedown(firstsel,toc);
+		else if (act==="add") r=manipulate.addnode(firstsel,toc);
+		else if (act==="remove") r=manipulate.removenode(firstsel,toc);
+		if (r) {
+			buildToc(toc);
+			var enabled=manipulate.enabled(this.state.selected,this.props.data);
+			this.setState({enabled:enabled});
+		}
+	}
+	,render:function() {
+		var controls=null;
+		if (this.props.opts.editable) controls=E(Controls,{action:this.action,enabled:this.state.enabled});
+		return E("div",{},controls,
+			E(TreeNode,{data:this.props.data,
+				editcaption:this.state.editcaption,
+				selected:this.state.selected,
+				action:this.action,opts:this.props.opts,cur:0}));
+	}
+})
+module.exports={component:TreeToc,genToc:genToc,buildToc:buildToc};

@@ -21,7 +21,7 @@ var Controls=React.createClass({
 	,render:function() {
 		return E("div",{},
 			E("button" ,{onClick:this.act("add"),title:"New Node",disabled:this.enb("add")},"＋"),
-			E("button"　,{onClick:this.act("remove"),title:"remove Node",disabled:this.enb("remove")},"－"),
+			E("button"　,{style:{visibility:"hidden"}}," "),
 			E("button" ,{onClick:this.act("levelup"),title:"level -1",disabled:this.enb("levelup")},"⇠"),
 			E("button" ,{onClick:this.act("leveldown"),title:"level +1",disabled:this.enb("leveldown")},"⇢")
 		);

@@ -1,4 +1,4 @@
-var lastChild=function(n,toc) {
+var descendantOf=function(n,toc) { /* returning all descendants */
 	var d=toc[n].d;
 	n++;
 	while (n<toc.length) {
@@ -12,7 +12,7 @@ var levelup =function(sels,toc) { //move select node and descendants one level u
 	var n=sels[0];
 	var cur=toc[n];
 	var next=toc[n+1];
-	var nextsib=cur.n||lastChild(n,toc);
+	var nextsib=cur.n||descendantOf(n,toc);
 	if (next && next.d>cur.d) { //has child
 		for (var i=n+1;i<nextsib;i++) {
 			toc[i].d--;
@@ -80,4 +80,4 @@ var enabled=function(sels,toc) {
 	if (canRemove(sels,toc)) enabled.push("remove");
 	return enabled;
 }
-module.exports={enabled:enabled,levelup:levelup,leveldown:leveldown,add:add,remove:remove};
+module.exports={enabled:enabled,levelup:levelup,leveldown:leveldown,add:add,remove:remove,descendantOf:descendantOf};

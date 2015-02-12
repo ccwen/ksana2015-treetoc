@@ -1,5 +1,6 @@
 var React=require("react");
 var E=React.createElement;
+var manipulate=require("./manipulate");
 var TreeNode=React.createClass({
 	propTypes:{
 		data:React.PropTypes.array.isRequired
@@ -50,36 +51,55 @@ var TreeNode=React.createClass({
 	,renderItem:function(e,idx){
 		var t=this.props.data[e];
 		return E(TreeNode,{key:"k"+idx,cur:e,
-			editcaption:this.props.editcaption,selected:this.props.selected,
+			editcaption:this.props.editcaption,selected:this.props.selected,deleting:this.props.deleting,
 			action:this.props.action,data:this.props.data,opts:this.props.opts});
+	}
+	,renderDeleteButton:function(n) {
+		var childnode=null;
+		var children=manipulate.descendantOf(n,this.props.data);
+		if (children>n+1) childnode=E("span",{}," "+(children-n)+" nodes");
+		var out=E("button",{className:"deletebutton"},"Delete",childnode);
+		return out;
+	}
+	,renderFolderButton:function(n) {
+		var next=this.props.data[n+1];
+		var cur=this.props.data[n];
+		var folderbutton=null;
+		if (next && next.d>cur.d) { 
+			if (cur.o) folderbutton=E("a",{className:"folderbutton opened",onClick:this.click},"－");
+			else       folderbutton=E("a",{className:"folderbutton closed",onClick:this.click},"＋");
+		} else {
+			folderbutton=E("a",{ className:"leaf", "style":{"visibility":"hidden"} },"　");
+		}
+		return folderbutton;
+	}
+	,renderCaption:function(n) {
+		var cur=this.props.data[n];
+		var selected="";
+		if (this.props.selected.indexOf(n)>-1) selected=" selected";
+		var caption=null;
+		if (this.props.deleting===n) {
+			caption=this.renderDeleteButton(n);
+		} else if (this.props.editcaption===n) {
+			caption=E("input",{onKeyPress:this.keypress,className:"",ref:"editcaption",defaultValue:cur.t});
+		} else {
+			caption=E("span",{className:selected+" caption",title:n},cur.t);
+		}
+		return caption;
 	}
 	,render:function() {
 		var n=this.props.cur;
 		var cur=this.props.data[n];
-		var next=this.props.data[n+1];
-		var selected="",extra="",children=[];
-		var folderbutton=null;
+		var extra="",children=[];
 		var depthdeco=renderDepth(cur.d,this.props.opts)
 		if (cur.d==0) extra=" treetoc";
-		if (this.props.selected.indexOf(n)>-1) selected=" selected";
-		if (next && next.d>cur.d) { 
-			if (cur.o) {
-				children=enumChildren(this.props.data,n);
-				folderbutton=E("a",{className:"folderbutton opened",onClick:this.click},"－");
-			}
-			else {
-				folderbutton=E("a",{className:"folderbutton closed",onClick:this.click},"＋");
-			}
-		} else {
-			folderbutton=E("a",{ className:"leaf", "style":{"visibility":"hidden"} },"　");
-		}
+		
+		var folderbutton=this.renderFolderButton(n);
+		if (cur.o) children=enumChildren(this.props.data,n);
 
 		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur);
-		var caption=E("span",{className:selected+" caption",title:n},cur.t);
-		if (this.props.editcaption===n) {
-			caption=E("input",{onKeyPress:this.keypress,className:"",ref:"editcaption",defaultValue:cur.t});
-			extracomponent=null;
-		}
+		caption=this.renderCaption(n);
+		if (this.props.editcaption>-1) extracomponent=null;
 
 		return E("div",{onClick:this.select,"data-n":n,className:"childnode"+extra},
 			   folderbutton,depthdeco,

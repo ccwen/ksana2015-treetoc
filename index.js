@@ -52,14 +52,20 @@ var TreeToc=React.createClass({
 		var toc=this.props.data;
 		var r=false;
 		if (act==="updateall") {
-			this.setState({editcaption:-1});
+			this.setState({editcaption:-1,deleting:-1});
 		} else if (act==="editcaption") {
 			this.setState({editcaption:parseInt(p1),enabled:[]});
+		} else if (act==="deleting") {
+			this.setState({deleting:this.state.editcaption});
 		} else if (act==="changecaption") {
 			if (!this.state.editcaption===-1) return;
-			this.props.data[this.state.editcaption].t=p1;
-			var enabled=manipulate.enabled(this.state.selected,this.props.data);
-			this.setState({editcaption:-1,enabled:enabled});
+			if (!p1) {
+				this.action("deleting");
+			} else {
+				this.props.data[this.state.editcaption].t=p1;
+				var enabled=manipulate.enabled(this.state.selected,this.props.data);
+				this.setState({editcaption:-1,enabled:enabled});
+			}
 		} else if (act==="select") {
 			var selected=this.state.selected;
 			if (!(this.props.opts.multiselect && p2)) {
@@ -68,7 +74,7 @@ var TreeToc=React.createClass({
 			var n=parseInt(p1);
 			if (n>0) selected.push(n);
 			var enabled=manipulate.enabled(selected,toc);
-			this.setState({selected:selected,editcaption:-1,enabled:enabled});
+			this.setState({selected:selected,editcaption:-1,enabled:enabled,deleting:-1});
 		} else if (act==="levelup") r=manipulate.levelup(sels,toc);
 		else if (act==="leveldown") r=manipulate.leveldown(sels,toc);
 		else if (act==="add") r=manipulate.addnode(sels,toc);
@@ -85,6 +91,7 @@ var TreeToc=React.createClass({
 		return E("div",{},controls,
 			E(TreeNode,{data:this.props.data,
 				editcaption:this.state.editcaption,
+				deleting:this.state.deleting,
 				selected:this.state.selected,
 				action:this.action,opts:this.props.opts,cur:0}));
 	}

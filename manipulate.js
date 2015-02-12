@@ -43,8 +43,19 @@ var levelDown =function(sels,toc) {
 	return true;
 }
 
-var addNode =function(sels,toc) {
-	
+var addNode =function(toc,n,newnodes,insertbefore) {
+	var d=toc[n].d;
+	if (!insertbefore) {
+		toc[n].o=true;
+		n++;
+	}
+	var args=[n,0];
+
+	for (var i=0;i<newnodes.length;i++) {
+		args.push({d:d,t:newnodes[i]});
+	}
+	toc.splice.apply(toc,args);
+	return true;
 }
 var deleteNode =function(sels,toc) {
 	if (!canDeleteNode(sels,toc))return; //move select node descendants one level down
@@ -53,13 +64,11 @@ var deleteNode =function(sels,toc) {
 	toc.splice(n,to-n);
 	return true;
 }
-var canAddNode=function(sels,toc) {
 
-}
 var canDeleteNode=function(sels,toc) {
 	if (sels.length==0) return false;
 	var n=sels[0];
-	return (sels.length==1 && toc[n].d>0);	
+	return (sels.length==1 && toc[n].d>0 && toc.length>2);
 }
 var canLevelup=function(sels,toc) {
 	if (sels.length==0) return false;
@@ -84,7 +93,6 @@ var enabled=function(sels,toc) {
 	var enabled=[];
 	if (canLeveldown(sels,toc)) enabled.push("leveldown");
 	if (canLevelup(sels,toc)) enabled.push("levelup");
-	if (canAddNode(sels,toc)) enabled.push("addnode");
 	if (canDeleteNode(sels,toc)) enabled.push("deletenode");
 	return enabled;
 }

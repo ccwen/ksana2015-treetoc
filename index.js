@@ -6,7 +6,6 @@
 */
 var React=require("react");
 var TreeNode=require("./treenode");
-var Controls=require("./controls");
 var E=React.createElement;
 var manipulate=require("./manipulate");
 
@@ -41,7 +40,7 @@ var TreeToc=React.createClass({
 		,opts:React.PropTypes.object
 	}
 	,getInitialState:function(){
-		return {editcaption:-1,selected:[],enabled:[]};
+		return {editcaption:-1,selected:[]};
 	}
 	,action:function() {
 		var args=Array.prototype.slice.apply(arguments);
@@ -54,7 +53,8 @@ var TreeToc=React.createClass({
 		if (act==="updateall") {
 			this.setState({editcaption:-1,deleting:-1});
 		} else if (act==="editcaption") {
-			this.setState({editcaption:parseInt(p1),enabled:[]});
+			var n=parseInt(p1);
+			this.setState({editcaption:n,selected:[n]});
 		} else if (act==="deleting") {
 			this.setState({deleting:this.state.editcaption});
 		} else if (act==="changecaption") {
@@ -63,8 +63,7 @@ var TreeToc=React.createClass({
 				this.action("deleting");
 			} else {
 				this.props.data[this.state.editcaption].t=p1;
-				var enabled=manipulate.enabled(this.state.selected,this.props.data);
-				this.setState({editcaption:-1,enabled:enabled});
+				this.setState({editcaption:-1});
 			}
 		} else if (act==="select") {
 			var selected=this.state.selected;
@@ -73,27 +72,32 @@ var TreeToc=React.createClass({
 			}
 			var n=parseInt(p1);
 			if (n>0) selected.push(n);
-			var enabled=manipulate.enabled(selected,toc);
-			this.setState({selected:selected,editcaption:-1,enabled:enabled,deleting:-1});
-		} else if (act==="levelup") r=manipulate.levelUp(sels,toc);
+			this.setState({selected:selected,editcaption:-1,deleting:-1,adding:0});
+		} else if (act==="addingnode") {
+			var insertAt=sels[0];
+			if (p1) {
+				insertAt=-insertAt; //ctrl pressed insert before
+			}
+			this.setState({adding:insertAt,editcaption:-1});
+		} else if (act=="addnode") {
+			var n=this.state.selected[0];
+			r=manipulate.addNode(toc,n,p1,p2)
+		}else if (act==="levelup") r=manipulate.levelUp(sels,toc);
 		else if (act==="leveldown") r=manipulate.levelDown(sels,toc);
-		else if (act==="addnode") r=manipulate.addNode(sels,toc);
 		else if (act==="deletenode") r=manipulate.deleteNode(sels,toc);
 		if (r) {
 			buildToc(toc);
-			var enabled=manipulate.enabled(this.state.selected,this.props.data);
-			this.setState({enabled:enabled,editcaption:-1,deleting:-1});
+			this.setState({editcaption:-1,deleting:-1,adding:0});
 			if (act==="deletenode") this.setState({selected:[]});
 		}
 	}
 	,render:function() {
-		var controls=null;
-		if (this.props.opts.editable) controls=E(Controls,{action:this.action,enabled:this.state.enabled});
-		return E("div",{},controls,
+		return E("div",{},
 			E(TreeNode,{data:this.props.data,
 				editcaption:this.state.editcaption,
 				deleting:this.state.deleting,
 				selected:this.state.selected,
+				adding:this.state.adding,
 				action:this.action,opts:this.props.opts,cur:0}));
 	}
 })

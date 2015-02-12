@@ -14,13 +14,13 @@ var Controls=React.createClass({
 	}
 	,act:function(name) {
 		var that=this;
-		return function(){
-			that.props.action(name);
+		return function(e){
+			that.props.action(name,e.ctrlKey);
 		}
 	}
 	,render:function() {
-		return E("div",{},
-			E("button" ,{onClick:this.act("addnode"),title:"New Node",disabled:this.enb("addnode")},"＋"),
+		return E("span",{},
+			E("button" ,{onClick:this.act("addingnode"),title:"Create a new node below, press Ctrl to above here."},"＋"),
 			E("button"　,{style:{visibility:"hidden"}}," "),
 			E("button" ,{onClick:this.act("levelup"),title:"level -1",disabled:this.enb("levelup")},"⇠"),
 			E("button" ,{onClick:this.act("leveldown"),title:"level +1",disabled:this.enb("leveldown")},"⇢")

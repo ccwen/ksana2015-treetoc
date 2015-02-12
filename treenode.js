@@ -15,7 +15,13 @@ var TreeNode=React.createClass({
 	,getDefaultProps:function() {
 		return {cur:0,opts:{}};
 	}
-
+	,componentDidMount:function() {
+		if (this.props.opts.velocityEffect) {
+	    	var velocity=require("velocity-animate/velocity.min.js");
+	    	require("velocity-animate/velocity.ui.js");
+	    	velocity(this.getDOMNode(),this.props.opts.velocityEffect);
+		}
+	}
 	,click:function(e) {
 		var n=parseInt(e.target.parentElement.attributes['data-n'].value);
 		this.props.data[n].o=!this.props.data[n].o;
@@ -54,11 +60,14 @@ var TreeNode=React.createClass({
 			editcaption:this.props.editcaption,selected:this.props.selected,deleting:this.props.deleting,
 			action:this.props.action,data:this.props.data,opts:this.props.opts});
 	}
+	,deleteNodes:function() {
+		this.props.action("deletenode");
+	}
 	,renderDeleteButton:function(n) {
 		var childnode=null;
 		var children=manipulate.descendantOf(n,this.props.data);
 		if (children>n+1) childnode=E("span",{}," "+(children-n)+" nodes");
-		var out=E("button",{className:"deletebutton"},"Delete",childnode);
+		var out=E("button",{onClick:this.deleteNodes,className:"deletebutton"},"Delete",childnode);
 		return out;
 	}
 	,renderFolderButton:function(n) {

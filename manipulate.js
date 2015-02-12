@@ -7,7 +7,7 @@ var descendantOf=function(n,toc) { /* returning all descendants */
 	}
 	return toc.length-1;
 }
-var levelup =function(sels,toc) { //move select node and descendants one level up
+var levelUp =function(sels,toc) { //move select node and descendants one level up
 	if (!canLevelup(sels,toc))return;
 	var n=sels[0];
 	var cur=toc[n];
@@ -22,7 +22,7 @@ var levelup =function(sels,toc) { //move select node and descendants one level u
 	cur.o=true;//force open this node , so that sibling is visible
 	return true;
 }
-var leveldown =function(sels,toc) {
+var levelDown =function(sels,toc) {
 	if (!canLeveldown(sels,toc))return; //move select node descendants one level down
 	var n=sels[0];
 	var cur=toc[n];
@@ -43,15 +43,23 @@ var leveldown =function(sels,toc) {
 	return true;
 }
 
-var add =function(sels,toc) {
+var addNode =function(sels,toc) {
 	
 }
-var remove =function(sels,toc) {
-	
+var deleteNode =function(sels,toc) {
+	if (!canDeleteNode(sels,toc))return; //move select node descendants one level down
+	var n=sels[0];
+	var to=descendantOf(n,toc);
+	toc.splice(n,to-n);
+	return true;
 }
-var canAdd=function(sels,toc) {
+var canAddNode=function(sels,toc) {
+
 }
-var canRemove=function(sels,toc) {
+var canDeleteNode=function(sels,toc) {
+	if (sels.length==0) return false;
+	var n=sels[0];
+	return (sels.length==1 && toc[n].d>0);	
 }
 var canLevelup=function(sels,toc) {
 	if (sels.length==0) return false;
@@ -76,8 +84,9 @@ var enabled=function(sels,toc) {
 	var enabled=[];
 	if (canLeveldown(sels,toc)) enabled.push("leveldown");
 	if (canLevelup(sels,toc)) enabled.push("levelup");
-	if (canAdd(sels,toc)) enabled.push("add");
-	if (canRemove(sels,toc)) enabled.push("remove");
+	if (canAddNode(sels,toc)) enabled.push("addnode");
+	if (canDeleteNode(sels,toc)) enabled.push("deletenode");
 	return enabled;
 }
-module.exports={enabled:enabled,levelup:levelup,leveldown:leveldown,add:add,remove:remove,descendantOf:descendantOf};
+module.exports={enabled:enabled,levelUp:levelUp,levelDown:levelDown,
+	addNode:addNode,deleteNode:deleteNode,descendantOf:descendantOf};

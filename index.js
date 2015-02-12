@@ -75,14 +75,15 @@ var TreeToc=React.createClass({
 			if (n>0) selected.push(n);
 			var enabled=manipulate.enabled(selected,toc);
 			this.setState({selected:selected,editcaption:-1,enabled:enabled,deleting:-1});
-		} else if (act==="levelup") r=manipulate.levelup(sels,toc);
-		else if (act==="leveldown") r=manipulate.leveldown(sels,toc);
-		else if (act==="add") r=manipulate.addnode(sels,toc);
-		else if (act==="remove") r=manipulate.removenode(sels,toc);
+		} else if (act==="levelup") r=manipulate.levelUp(sels,toc);
+		else if (act==="leveldown") r=manipulate.levelDown(sels,toc);
+		else if (act==="addnode") r=manipulate.addNode(sels,toc);
+		else if (act==="deletenode") r=manipulate.deleteNode(sels,toc);
 		if (r) {
 			buildToc(toc);
 			var enabled=manipulate.enabled(this.state.selected,this.props.data);
-			this.setState({enabled:enabled});
+			this.setState({enabled:enabled,editcaption:-1,deleting:-1});
+			if (act==="deletenode") this.setState({selected:[]});
 		}
 	}
 	,render:function() {

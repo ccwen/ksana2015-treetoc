@@ -10,7 +10,7 @@ var E=React.createElement;
 var manipulate=require("./manipulate");
 
 var buildToc = function(toc) {
-	if (!toc || !toc.length) return;  
+	if (!toc || !toc.length) return;
 	var depths=[];
  	var prev=0;
  	if (toc.length>1) {
@@ -26,21 +26,27 @@ var buildToc = function(toc) {
     	depths[depth]=i;
     	prev=depth;
 	}
+	return toc;
 }
 var genToc=function(toc,title) {
     var out=[{depth:0,text:title||ksana.js.title}];
     if (toc.texts) for (var i=0;i<toc.texts.length;i++) {
-      out.push({t:toc.texts[i],d:toc.depths[i], voff:toc.vpos[i]});
+      out.push({t:toc.texts[i],d:toc.depths[i], vpos:toc.vpos[i]});
     }
-    return out; 
+    return out;
 }
 var TreeToc=React.createClass({
 	propTypes:{
 		data:React.PropTypes.array.isRequired
 		,opts:React.PropTypes.object
+		,onSelect:React.PropTypes.func
+		,tocid:React.PropTypes.string
 	}
 	,getInitialState:function(){
 		return {editcaption:-1,selected:[]};
+	}
+	,getDefaultProps:function() {
+		return {opts:{}};
 	}
 	,action:function() {
 		var args=Array.prototype.slice.apply(arguments);
@@ -72,6 +78,9 @@ var TreeToc=React.createClass({
 			}
 			var n=parseInt(p1);
 			if (n>0) selected.push(n);
+			if (this.props.onSelect) {
+				this.props.onSelect(n,this.props.tocid);
+			}
 			this.setState({selected:selected,editcaption:-1,deleting:-1,adding:0});
 		} else if (act==="addingnode") {
 			var insertAt=sels[0];

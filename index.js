@@ -35,6 +35,7 @@ var genToc=function(toc,title) {
     }
     return out;
 }
+
 var TreeToc=React.createClass({
 	propTypes:{
 		data:React.PropTypes.array.isRequired

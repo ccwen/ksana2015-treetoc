@@ -1,18 +1,17 @@
-var React=require("react");
+var React=require("react/addons");
 var E=React.createElement;
 var manipulate=require("./manipulate");
 var Controls=require("./controls");
 var AddNode=require("./addnode");
+
 var TreeNode=React.createClass({
-	propTypes:{
+	mixins:[React.addons.pureRenderMixin]
+	,propTypes:{
 		data:React.PropTypes.array.isRequired
 		,opts:React.PropTypes.object
 		,action:React.PropTypes.func.isRequired
 		,selected:React.PropTypes.array
 		,cur:React.PropTypes.number.isRequired
-	}
-	,getInitialState:function() {
-		return {};
 	}
 	,getDefaultProps:function() {
 		return {cur:0,opts:{}};
@@ -123,6 +122,7 @@ var TreeNode=React.createClass({
 			action:this.props.action,data:this.props.data,opts:this.props.opts});
 	}
 	,render:function() {
+		if (this.props.data.length===0) return E("span",{},"");
 		var n=this.props.cur;
 		var cur=this.props.data[n];
 		var extra="",children=[];

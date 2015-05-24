@@ -4,6 +4,20 @@ var manipulate=require("./manipulate");
 var Controls=require("./controls");
 var AddNode=require("./addnode");
 
+var styles={
+	selectedcaption:{cursor:"pointer",background:"highlight",borderRadius:"5px"}
+	,caption:{cursor:"pointer"}
+	,childnode:{left:"15px",position:"relative"}
+	,rootnode:{position:"relative"}
+	,folderbutton: {cursor:"pointer",borderRadius:"50%"}
+	,closed:{cursor:"pointer",fontSize:"75%"}
+	,opened:{cursor:"pointer",fontSize:"75%"}	
+	,leaf:{fontSize:"75%"}	
+	,hiddenleaf:{visibility:"hidden"}	
+	,deletebutton:{background:"red",color:"yellow"}
+	,nodelink:{fontSize:"65%",cursor:"pointer"}
+};
+
 var TreeNode=React.createClass({
 	mixins:[React.addons.pureRenderMixin]
 	,propTypes:{
@@ -15,13 +29,6 @@ var TreeNode=React.createClass({
 	}
 	,getDefaultProps:function() {
 		return {cur:0,opts:{}};
-	}
-	,componentDidMount:function() {
-		if (this.props.opts.velocityEffect) {
-	    	var velocity=require("velocity-animate/velocity.min.js");
-	    	require("velocity-animate/velocity.ui.js");
-	    	velocity(this.getDOMNode(),this.props.opts.velocityEffect);
-		}
 	}
 	,click:function(e) {
 		var n=parseInt(e.target.parentElement.attributes['data-n'].value);
@@ -70,25 +77,36 @@ var TreeNode=React.createClass({
 		var childnode=null;
 		var children=manipulate.descendantOf(n,this.props.data);
 		if (children>n+1) childnode=E("span",{}," "+(children-n)+" nodes");
-		var out=E("button",{onClick:this.deleteNodes,className:"deletebutton"},"Delete",childnode);
+		var out=E("button",{onClick:this.deleteNodes,style:styles.deletebutton},"Delete",childnode);
 		return out;
+	}
+	,mouseenter:function(e) {
+		e.target.style.background="highlight";
+		var t=e.target.innerHTML;
+		if (t==="＋"||t==="－") e.target.style.borderRadius="50%";
+		else e.target.style.borderRadius="5px";
+	}
+	,mouseleave:function(e) {
+		e.target.style.background="none";
 	}
 	,renderFolderButton:function(n) {
 		var next=this.props.data[n+1];
 		var cur=this.props.data[n];
 		var folderbutton=null;
+		var props={style:styles.closed, onClick:this.click, onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave};
+		if (cur.o) props.style=styles.opened;
 		if (next && next.d>cur.d) { 
-			if (cur.o) folderbutton=E("a",{className:"folderbutton opened",onClick:this.click},"－");//"▼"
-			else       folderbutton=E("a",{className:"folderbutton closed",onClick:this.click},"＋");//"▷"
+			if (cur.o) folderbutton=E("a",props,"－");//"▼"
+			else       folderbutton=E("a",props,"＋");//"▷"
 		} else {
-			folderbutton=E("a",{ className:"leaf", "style":{"visibility":"hidden"} },"　");
+			folderbutton=E("a",{ style:styles.hiddenleaf},"　");
 		}
 		return folderbutton;
 	}
 	,renderCaption:function(n) {
 		var cur=this.props.data[n];
-		var selected="";
-		if (this.props.selected.indexOf(n)>-1) selected=" selected";
+		var stylename="caption";
+		if (this.props.selected.indexOf(n)>-1) stylename="selectedcaption";
 		var caption=null;
 		if (this.props.deleting===n) {
 			caption=this.renderDeleteButton(n);
@@ -96,9 +114,10 @@ var TreeNode=React.createClass({
 			var size=cur.t.length+2;
 			if (size<5) size=5;
 			caption=E("input",{onKeyDown:this.editingkeydown,
-				               size:size,className:"",ref:"editcaption",defaultValue:cur.t});
+				               size:size,ref:"editcaption",defaultValue:cur.t});
 		} else {
-			caption=E("span",{className:selected+" caption",title:n},cur.t);
+			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave,
+				style:styles[stylename],title:n},cur.t);
 		}
 		return caption;
 	}
@@ -125,21 +144,22 @@ var TreeNode=React.createClass({
 		if (this.props.data.length===0) return E("span",{},"");
 		var n=this.props.cur;
 		var cur=this.props.data[n];
-		var extra="",children=[];
+		var stylename="childnode",children=[];
+		var selected=this.props.selected.indexOf(n)>-1;
 		var depthdeco=renderDepth(cur.d,this.props.opts)
-		if (cur.d==0) extra=" treetoc";
+		if (cur.d==0) stylename="rootnode";
 		var adding_before_controls=this.renderAddingNode(-n,true);
 		var adding_after_controls=this.renderAddingNode(n);
 		var editcontrols=this.renderEditControls(n);
 		var folderbutton=this.renderFolderButton(n);
 		if (cur.o) children=enumChildren(this.props.data,n);
 
-		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur);
+		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur,selected,n);
 		caption=this.renderCaption(n);
 		if (this.props.editcaption>-1 || this.props.deleting>-1) extracomponent=null;
 		if (this.props.deleting>-1) editcontrols=null;
 
-		return E("div",{onClick:this.select,"data-n":n,className:"childnode"+extra},
+		return E("div",{onClick:this.select,"data-n":n,style:styles[stylename]},
 			   adding_before_controls,
 			   folderbutton,depthdeco,
 			   editcontrols,
@@ -157,7 +177,7 @@ var renderDepth=function(depth,opts) {
   if (opts&&opts.tocstyle=="ganzhi") {
     return E("span", null, ganzhi[depth].trim()+" ");
   } else {
-    if (depth) return E("span", null, depth, ".")
+    if (opts&&opts.numberDepth && depth) return E("span", null, depth, ".")
     else return null;
   }
   return null;

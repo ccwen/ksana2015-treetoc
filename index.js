@@ -10,7 +10,7 @@ var E=React.createElement;
 var manipulate=require("./manipulate");
 
 var buildToc = function(toc) {
-	if (!toc || !toc.length) return;
+	if (!toc || !toc.length || toc.built) return;
 	var depths=[];
  	var prev=0;
  	if (toc.length>1) {
@@ -26,6 +26,7 @@ var buildToc = function(toc) {
     	depths[depth]=i;
     	prev=depth;
 	}
+	toc.built=true;
 	return toc;
 }
 var genToc=function(toc,title) {
@@ -45,6 +46,11 @@ var TreeToc=React.createClass({
 	}
 	,getInitialState:function(){
 		return {editcaption:-1,selected:[]};
+	}
+	,componentWillReceiveProps:function(nextProps) {
+		if (nextProps.data && !nextProps.data.built) {
+			buildToc(nextProps.data);
+		}
 	}
 	,getDefaultProps:function() {
 		return {opts:{}};
@@ -80,7 +86,7 @@ var TreeToc=React.createClass({
 			var n=parseInt(p1);
 			if (n>0) selected.push(n);
 			if (this.props.onSelect) {
-				this.props.onSelect(n,this.props.tocid);
+				this.props.onSelect(this.props.tocid,this.props.data[n],n,this.props.data);
 			}
 			this.setState({selected:selected,editcaption:-1,deleting:-1,adding:0});
 		} else if (act==="addingnode") {

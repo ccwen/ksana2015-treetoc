@@ -1,4 +1,6 @@
 var rangeOfTreeNode=function(toc,n) {
+  //setting the ending vpos of a treenode
+  //this value is fixed when hits is changed, but not saved in kdb
   if (typeof toc[n].end!=="undefined") return;
 
   if (n+1>=toc.length) {
@@ -23,6 +25,7 @@ var rangeOfTreeNode=function(toc,n) {
   }
 }
 var calculateHit=function(toc,hits,n) {
+
   var start=toc[n].vpos;
   var end=toc[n].end;
   if (n==0) {
@@ -41,9 +44,12 @@ var treenodehits=function(toc,hits,n) {
 
   if (toc.length<2) return 0 ;
 
+  //need to clear toc[n].hit when hits is changed.
+  //see index.js clearHits()
   if (typeof toc[n].hit!=="undefined") return toc[n].hit;
 
   rangeOfTreeNode(toc,n);
+
   return toc[n].hit=calculateHit(toc,hits,n);
 }
 

@@ -1,9 +1,10 @@
 var React=require("react/addons");
 var E=React.createElement;
+var update=React.addons.update;
 var manipulate=require("./manipulate");
 var Controls=require("./controls");
 var AddNode=require("./addnode");
-
+var treenodehits=require("./treenodehits");
 var styles={
 	selectedcaption:{cursor:"pointer",background:"highlight",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}
@@ -16,26 +17,29 @@ var styles={
 	,hiddenleaf:{visibility:"hidden"}	
 	,deletebutton:{background:"red",color:"yellow"}
 	,nodelink:{fontSize:"65%",cursor:"pointer"}
+	,hit:{color:"pink",fontSize:"65%",cursor:"pointer"}
 };
+
 
 var TreeNode=React.createClass({
 	mixins:[React.addons.pureRenderMixin]
 	,propTypes:{
-		data:React.PropTypes.array.isRequired
+		toc:React.PropTypes.array.isRequired
 		,opts:React.PropTypes.object
-		,action:React.PropTypes.func.isRequired
-		,selected:React.PropTypes.array
-		,cur:React.PropTypes.number.isRequired
+		,action:React.PropTypes.func.isRequired 
+		,selected:React.PropTypes.array         //selected treenode (multiple)
+		,cur:React.PropTypes.number.isRequired //current active treenode
+		,styles:React.PropTypes.object  //custom style
 	}
 	,getDefaultProps:function() {
-		return {cur:0,opts:{}};
+		return {cur:0,opts:{},toc:[]};
 	}
 	,click:function(e) {
 		var n=parseInt(e.target.parentElement.attributes['data-n'].value);
-		this.props.data[n].o=!this.props.data[n].o;
+		this.props.toc[n].o=!this.props.toc[n].o;
 		this.forceUpdate();
 		e.preventDefault();
-        e.stopPropagation();
+    e.stopPropagation();
 	}
 	,select:function(e){
 		if (e.target.nodeName!=="SPAN") return;
@@ -49,7 +53,12 @@ var TreeNode=React.createClass({
 			this.props.action("select",n,e.ctrlKey);
 		}
 		e.preventDefault();
-        e.stopPropagation();
+    e.stopPropagation();
+	}
+	,componentWillReceiveProps:function(nextProps) {
+		if (nextProps.styles && nextProps.styles!==this.props.styles) {
+			styles=update(styles,{$merge:nextProps.styles});
+		}
 	}
 	,componentDidUpdate:function() {
 		if (this.refs.editcaption) {
@@ -75,23 +84,26 @@ var TreeNode=React.createClass({
 	}
 	,renderDeleteButton:function(n) {
 		var childnode=null;
-		var children=manipulate.descendantOf(n,this.props.data);
+		var children=manipulate.descendantOf(n,this.props.toc);
 		if (children>n+1) childnode=E("span",{}," "+(children-n)+" nodes");
 		var out=E("button",{onClick:this.deleteNodes,style:styles.deletebutton},"Delete",childnode);
 		return out;
 	}
 	,mouseenter:function(e) {
 		e.target.style.background="highlight";
+		e.target.style.oldcolor=e.target.style.color;
+		e.target.style.color="HighlightText";
 		var t=e.target.innerHTML;
 		if (t==="＋"||t==="－") e.target.style.borderRadius="50%";
 		else e.target.style.borderRadius="5px";
 	}
 	,mouseleave:function(e) {
 		e.target.style.background="none";
+		e.target.style.color=e.target.style.oldcolor;
 	}
 	,renderFolderButton:function(n) {
-		var next=this.props.data[n+1];
-		var cur=this.props.data[n];
+		var next=this.props.toc[n+1];
+		var cur=this.props.toc[n];
 		var folderbutton=null;
 		var props={style:styles.closed, onClick:this.click, onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave};
 		if (cur.o) props.style=styles.opened;
@@ -104,7 +116,7 @@ var TreeNode=React.createClass({
 		return folderbutton;
 	}
 	,renderCaption:function(n) {
-		var cur=this.props.data[n];
+		var cur=this.props.toc[n];
 		var stylename="caption";
 		if (this.props.selected.indexOf(n)>-1) stylename="selectedcaption";
 		var caption=null;
@@ -129,21 +141,30 @@ var TreeNode=React.createClass({
 	,renderEditControls:function(n) {
 		if (!this.props.opts.editable) return;
 		if (this.props.editcaption===n) {	
-			var enabled=manipulate.enabled([n],this.props.data);
+			var enabled=manipulate.enabled([n],this.props.toc);
 			return E(Controls,{action:this.props.action,enabled:enabled});
 		} 
 	}
 	,renderItem:function(e,idx){
-		var t=this.props.data[e];
-		return E(TreeNode,{key:"k"+idx,cur:e,
-			editcaption:this.props.editcaption,selected:this.props.selected,
-			deleting:this.props.deleting,adding:this.props.adding,
-			action:this.props.action,data:this.props.data,opts:this.props.opts});
+		var t=this.props.toc[e];
+		var props=update(this.props,{$merge:{key:"k"+idx,cur:e}});
+		return E(TreeNode,props);
+	}
+	,clickhit:function(e) {
+		var n=parseInt(e.target.dataset.n);
+		this.props.action("hitclick",n);
+		e.preventDefault();
+		e.stopPropagation();
+	}
+	,renderHit:function(hit,n) {
+		if (!hit) return;
+		return E("span",{onClick:this.clickhit,style:styles.hit,"data-n":n,
+			onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave},hit);
 	}
 	,render:function() {
-		if (this.props.data.length===0) return E("span",{},"");
+		if (this.props.toc.length===0) return E("span",{},"");
 		var n=this.props.cur;
-		var cur=this.props.data[n];
+		var cur=this.props.toc[n];
 		var stylename="childnode",children=[];
 		var selected=this.props.selected.indexOf(n)>-1;
 		var depthdeco=renderDepth(cur.d,this.props.opts)
@@ -152,18 +173,20 @@ var TreeNode=React.createClass({
 		var adding_after_controls=this.renderAddingNode(n);
 		var editcontrols=this.renderEditControls(n);
 		var folderbutton=this.renderFolderButton(n);
-		if (cur.o) children=enumChildren(this.props.data,n);
+		if (cur.o) children=enumChildren(this.props.toc,n);
 
 		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur,selected,n);
 		caption=this.renderCaption(n);
 		if (this.props.editcaption>-1 || this.props.deleting>-1) extracomponent=null;
 		if (this.props.deleting>-1) editcontrols=null;
+		var hits=treenodehits(this.props.toc,this.props.hits,n);
 
 		return E("div",{onClick:this.select,"data-n":n,style:styles[stylename]},
 			   adding_before_controls,
 			   folderbutton,depthdeco,
 			   editcontrols,
 			   caption,
+			   this.renderHit(hits,n),
 			   extracomponent,
 			   adding_after_controls,
 			   children.map(this.renderItem));

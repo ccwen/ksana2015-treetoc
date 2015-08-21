@@ -55,6 +55,9 @@ var TreeToc=React.createClass({
 			if (this.props.toc[i].hit) delete this.props.toc[i].hit;
 		}
 	}
+	,componentDidMount:function() {
+		buildToc(this.props.toc);
+	}
 	,componentWillReceiveProps:function(nextProps) {
 		if (nextProps.toc && !nextProps.toc.built) {
 			buildToc(nextProps.toc);

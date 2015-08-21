@@ -131,4 +131,4 @@ var TreeToc=React.createClass({
 				hits:this.props.hits}));
 	}
 })
-module.exports={component:TreeToc,genToc:genToc,buildToc:buildToc};
+module.exports={Component:TreeToc,genToc:genToc,buildToc:buildToc};

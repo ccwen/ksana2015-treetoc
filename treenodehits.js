@@ -4,7 +4,6 @@ var rangeOfTreeNode=function(toc,n) {
   if (typeof toc[n].end!=="undefined") return;
 
   if (n+1>=toc.length) {
-    console.error("exceed toc length",n);
     return;
   }
   var depth=toc[n].d , nextdepth=toc[n+1].d;
@@ -13,7 +12,7 @@ var rangeOfTreeNode=function(toc,n) {
       return;
   } else  if (nextdepth>depth){
     if (toc[n].n) {
-      toc[n].end= toc[toc[n].n].vpos;  
+      toc[n].end= toc[toc[n].n].vpos || Number.MAX_VALUE;  
     } else { //last sibling
       var next=n+1;
       while (next<toc.length && toc[next].d>depth) next++;

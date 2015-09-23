@@ -69,6 +69,9 @@ var TreeToc=React.createClass({
 	,getDefaultProps:function() {
 		return {opts:{}};
 	}
+	,markDirty:function() {
+		this.props.onChanged&&this.props.onChanged();
+	}
 	,action:function() {
 		var args=Array.prototype.slice.apply(arguments);
 		var act=args.shift();
@@ -91,6 +94,7 @@ var TreeToc=React.createClass({
 			} else {
 				this.props.toc[this.state.editcaption].t=p1;
 				this.setState({editcaption:-1});
+				this.markDirty();
 			}
 		} else if (act==="select") {
 			var selected=this.state.selected;
@@ -119,9 +123,11 @@ var TreeToc=React.createClass({
 			this.props.onHitClick&&this.props.onHitClick(this.props.tocid,this.props.toc[p1],p1,this.props.toc);
 		}
 		if (r) {
+			toc.built=false;//force rebuild
 			buildToc(toc);
 			this.setState({editcaption:-1,deleting:-1,adding:0});
 			if (act==="deletenode") this.setState({selected:[]});
+			this.markDirty();
 		}
 	}
 	,render:function() {

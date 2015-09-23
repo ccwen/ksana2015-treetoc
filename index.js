@@ -98,8 +98,10 @@ var TreeToc=React.createClass({
 				selected=[];
 			}
 			var n=parseInt(p1);
-			if (n>0) selected.push(n);
-			this.props.onSelect&&this.props.onSelect(this.props.tocid,this.props.toc[n],n,this.props.toc);
+			if (!isNaN(n)) {
+				selected.push(n);
+				this.props.onSelect&&this.props.onSelect(this.props.tocid,this.props.toc[n],n,this.props.toc);
+			}
 			this.setState({selected:selected,editcaption:-1,deleting:-1,adding:0});
 		} else if (act==="addingnode") {
 			var insertAt=sels[0];

@@ -6,7 +6,7 @@ var Controls=require("./controls");
 var AddNode=require("./addnode");
 var treenodehits=require("./treenodehits");
 var styles={
-	selectedcaption:{cursor:"pointer",background:"highlight",borderRadius:"5px"}
+	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",background:"highlight",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}
 	,childnode:{left:"15px",position:"relative"}
 	,rootnode:{position:"relative"}
@@ -18,6 +18,7 @@ var styles={
 	,deletebutton:{background:"red",color:"yellow"}
 	,nodelink:{fontSize:"65%",cursor:"pointer"}
 	,hit:{color:"pink",fontSize:"65%",cursor:"pointer"}
+	,input:{fontSize:"100%"}
 };
 
 
@@ -125,7 +126,7 @@ var TreeNode=React.createClass({
 		} else if (this.props.editcaption===n) {
 			var size=cur.t.length+2;
 			if (size<5) size=5;
-			caption=E("input",{onKeyDown:this.editingkeydown,
+			caption=E("input",{onKeyDown:this.editingkeydown,style:styles.input,
 				               size:size,ref:"editcaption",defaultValue:cur.t});
 		} else {
 			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave,
@@ -140,7 +141,7 @@ var TreeNode=React.createClass({
 	}
 	,renderEditControls:function(n) {
 		if (!this.props.opts.editable) return;
-		if (this.props.editcaption===n) {	
+		if (this.props.editcaption===n && n>0) {	
 			var enabled=manipulate.enabled([n],this.props.toc);
 			return E(Controls,{action:this.props.action,enabled:enabled});
 		} 

@@ -1,5 +1,8 @@
 var React=require("react");
 var E=React.createElement;
+var styles={
+	textarea:{fontSize:"100%"}
+}
 var linecount=function(t) {
 	var lcount=0;
 	t.replace(/\n/g,function(){
@@ -25,7 +28,7 @@ var AddNode=React.createClass({
 	,render:function(){
 		return E("div", {}, 
 			E("textarea",
-				{onKeyDown:this.addingkeydown,ref:"adding"
+				{style:styles.textarea,onKeyDown:this.addingkeydown,ref:"adding"
 				 ,placeholder:"Enter twice to finish adding",defaultValue:""}
 		));
 	}

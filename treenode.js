@@ -176,9 +176,9 @@ var TreeNode=React.createClass({
 		var folderbutton=this.renderFolderButton(n);
 		if (cur.o) children=enumChildren(this.props.toc,n);
 
-		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur,selected,n);
-		caption=this.renderCaption(n);
-		if (this.props.editcaption>-1 || this.props.deleting>-1) extracomponent=null;
+		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur,selected,n,this.props.editcaption);
+		var caption=this.renderCaption(n);
+		if (this.props.deleting>-1) extracomponent=null;
 		if (this.props.deleting>-1) editcontrols=null;
 		var hits=treenodehits(this.props.toc,this.props.hits,n);
 

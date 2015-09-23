@@ -65,6 +65,7 @@ var TreeToc=React.createClass({
 		if (nextProps.hits!==this.props.hits) {
 			this.clearHits();
 		}
+		this.action("updateall");
 	}
 	,getDefaultProps:function() {
 		return {opts:{}};

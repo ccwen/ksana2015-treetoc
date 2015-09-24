@@ -21,7 +21,7 @@ var Controls=React.createClass({
 	,render:function() {
 		return E("span",{},
 			E("button" ,{onClick:this.act("addingnode"),title:"Create a new node below, press Ctrl to above here."},"＋"),
-			E("button"　,{style:{visibility:"hidden"}}," "),
+			E("button" ,{style:{visibility:"hidden"}}," "),
 			E("button" ,{onClick:this.act("levelup"),title:"level -1",disabled:this.enb("levelup")},"⇠"),
 			E("button" ,{onClick:this.act("leveldown"),title:"level +1",disabled:this.enb("leveldown")},"⇢")
 		);

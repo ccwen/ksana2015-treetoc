@@ -1,11 +1,11 @@
-var React=require("react/addons");
+var React=require("react");
 var E=React.createElement;
-var update=React.addons.update;
+
 var manipulate=require("./manipulate");
 var Controls=require("./controls");
 var AddNode=require("./addnode");
 var treenodehits=require("./treenodehits");
-var styles={
+var defaultstyles={
 	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",background:"highlight",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}
 	,childnode:{left:"15px",position:"relative"}
@@ -20,11 +20,10 @@ var styles={
 	,hit:{color:"pink",fontSize:"65%",cursor:"pointer"}
 	,input:{fontSize:"100%"}
 };
-
+var styles={};
 
 var TreeNode=React.createClass({
-	mixins:[React.addons.pureRenderMixin]
-	,propTypes:{
+	propTypes:{
 		toc:React.PropTypes.array.isRequired
 		,opts:React.PropTypes.object
 		,action:React.PropTypes.func.isRequired 
@@ -56,9 +55,12 @@ var TreeNode=React.createClass({
 		e.preventDefault();
     e.stopPropagation();
 	}
+
 	,componentWillReceiveProps:function(nextProps) {
 		if (nextProps.styles && nextProps.styles!==this.props.styles) {
-			styles=update(styles,{$merge:nextProps.styles});
+			var styles={};
+			for (var i in defaultstyles) styles[i]=defaultstyles[i];
+			for (var i in nextProps.styles) styles[i]=nextProps.styles[i];
 		}
 	}
 	,componentDidUpdate:function() {
@@ -148,7 +150,12 @@ var TreeNode=React.createClass({
 	}
 	,renderItem:function(e,idx){
 		var t=this.props.toc[e];
-		var props=update(this.props,{$merge:{key:"k"+idx,cur:e}});
+		var props={};
+		for (var i in this.props) {
+			props[i]=this.props[i];
+		}
+		props.key="k"+idx;
+		props.cur=e;
 		return E(TreeNode,props);
 	}
 	,clickhit:function(e) {

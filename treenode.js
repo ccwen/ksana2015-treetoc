@@ -135,8 +135,9 @@ var TreeNode=React.createClass({
 			caption=E("input",{onKeyDown:this.editingkeydown,style:styles.input,
 				               size:size,ref:"editcaption",defaultValue:cur.t});
 		} else {
-			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave,
-				style:styles[stylename],title:n},cur.t);
+			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave
+				,style:styles[stylename],title:n},cur.t+(cur.o?" ":""));
+			//force caption to repaint by appending extra space at the end
 		}
 		return caption;
 	}
@@ -158,6 +159,7 @@ var TreeNode=React.createClass({
 		for (var i in this.props) {
 			props[i]=this.props[i];
 		}
+		var opened=t.o?"o":"";
 		props.key="k"+e;
 		props.cur=e;
 		return E(TreeNode,props);
@@ -195,6 +197,7 @@ var TreeNode=React.createClass({
 		var hits=treenodehits(this.props.toc,this.props.hits,n);
 
 		return E("div",{onClick:this.select,"data-n":n,style:styles[stylename]},
+
 			   adding_before_controls,
 			   folderbutton,depthdeco,
 			   editcontrols,

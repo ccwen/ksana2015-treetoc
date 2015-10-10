@@ -34,6 +34,9 @@ var TreeNode=React.createClass({
 	,getDefaultProps:function() {
 		return {cur:0,opts:{},toc:[]};
 	}
+	,componentWillMount:function(){
+		this.cloneStyle();
+	}
 	,click:function(e) {
 		var n=parseInt(e.target.parentElement.attributes['data-n'].value);
 		this.props.toc[n].o=!this.props.toc[n].o;
@@ -55,13 +58,14 @@ var TreeNode=React.createClass({
 		e.preventDefault();
     e.stopPropagation();
 	}
+	,cloneStyle:function(newstyles) {
+		styles={};
+		for (var i in defaultstyles) styles[i]=defaultstyles[i];
+		if (newstyles) for (var i in newstyles) styles[i]=newstyles[i];
+	}
 
 	,componentWillReceiveProps:function(nextProps) {
-		if (nextProps.styles && nextProps.styles!==this.props.styles) {
-			var styles={};
-			for (var i in defaultstyles) styles[i]=defaultstyles[i];
-			for (var i in nextProps.styles) styles[i]=nextProps.styles[i];
-		}
+		if (nextProps.styles && nextProps.styles!==this.props.styles) this.cloneStyle(nextProps.styles)
 	}
 	,componentDidUpdate:function() {
 		if (this.refs.editcaption) {
@@ -154,7 +158,7 @@ var TreeNode=React.createClass({
 		for (var i in this.props) {
 			props[i]=this.props[i];
 		}
-		props.key="k"+idx;
+		props.key="k"+e;
 		props.cur=e;
 		return E(TreeNode,props);
 	}
@@ -181,10 +185,11 @@ var TreeNode=React.createClass({
 		var adding_after_controls=this.renderAddingNode(n);
 		var editcontrols=this.renderEditControls(n);
 		var folderbutton=this.renderFolderButton(n);
+		var caption=this.renderCaption(n);
+
 		if (cur.o) children=enumChildren(this.props.toc,n);
 
 		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur,selected,n,this.props.editcaption);
-		var caption=this.renderCaption(n);
 		if (this.props.deleting>-1) extracomponent=null;
 		if (this.props.deleting>-1) editcontrols=null;
 		var hits=treenodehits(this.props.toc,this.props.hits,n);

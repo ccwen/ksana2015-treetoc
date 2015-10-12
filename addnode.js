@@ -16,20 +16,20 @@ var AddNode=React.createClass({
 	}
 	,addingkeydown:function(e) {
 		var t=e.target.value;
-		if (e.key=="Enter" && t.charCodeAt(t.length-1)==10) {
-			this.props.action("addnode",t.trim().split("\n"),this.props.insertBefore);
+		if (e.key=="Enter" && t.charCodeAt(t.length-1)===10) {
+			this.props.action("addnode",t.split("\n"),this.props.insertBefore);
 		}
 		var lc=linecount(t);
 		e.target.rows=lc;
 	}
 	,componentDidMount:function() {
-		this.refs.adding.getDOMNode().focus();
+		this.refs.adding.focus();
 	}
 	,render:function(){
 		return E("div", {}, 
 			E("textarea",
 				{style:styles.textarea,onKeyDown:this.addingkeydown,ref:"adding"
-				 ,placeholder:"Enter twice to finish adding",defaultValue:""}
+				 ,placeholder:"leading space to create child node",defaultValue:""}
 		));
 	}
 

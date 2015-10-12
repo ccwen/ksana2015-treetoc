@@ -69,7 +69,7 @@ var TreeNode=React.createClass({
 	}
 	,componentDidUpdate:function() {
 		if (this.refs.editcaption) {
-			var dom=this.refs.editcaption.getDOMNode();
+			var dom=this.refs.editcaption;
 			dom.focus();
 			dom.selectionStart=dom.value.length;
 		}

@@ -42,17 +42,32 @@ var levelDown =function(sels,toc) {
 	cur.d++;
 	return true;
 }
+var parseDepth=function(s,basedepth,dnow) {
+	var d=0;
+	
+	while (s[0]===" ") {
+		s=s.substr(1);
+		d++;
+	}
+	if (basedepth+d>dnow+1) d=dnow+1-basedepth;
 
+	return {d:basedepth+d,t:s.trim()};
+}
 var addNode =function(toc,n,newnodes,insertbefore) {
-	var d=toc[n].d;
+	var d=toc[n].d, basedepth=d, dnow=d;
 	if (!insertbefore) {
 		toc[n].o=true;
 		n++;
 	}
+
 	var args=[n,0];
 
 	for (var i=0;i<newnodes.length;i++) {
-		args.push({d:d,t:newnodes[i]});
+		var r=parseDepth(newnodes[i],basedepth,dnow);
+		if (r.t) {
+			args.push(r);
+			dnow=r.d;
+		}
 	}
 	toc.splice.apply(toc,args);
 	return true;

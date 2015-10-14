@@ -56,9 +56,11 @@ var parseDepth=function(s,basedepth,dnow) {
 var addNode =function(toc,n,newnodes,insertbefore) {
 	var d=toc[n].d, basedepth=d, dnow=d;
 	if (!insertbefore) {
-		toc[n].o=true;
-		n++;
+		//toc[n].o=true;
+		if (toc[n].n)	n=toc[n].n ;
+		else (n++);
 	}
+	
 
 	var args=[n,0];
 

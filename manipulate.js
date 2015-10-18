@@ -78,7 +78,9 @@ var deleteNode =function(sels,toc) {
 	if (!canDeleteNode(sels,toc))return; //move select node descendants one level down
 	var n=sels[0];
 	var to=descendantOf(n,toc);
-	toc.splice(n,to-n);
+	var del=to-n;
+	if (n==toc.length-1) del++;
+	toc.splice(n,del);
 	return true;
 }
 

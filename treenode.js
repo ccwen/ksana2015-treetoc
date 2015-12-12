@@ -4,7 +4,7 @@ var E=React.createElement;
 var manipulate=require("./manipulate");
 var Controls=require("./controls");
 var AddNode=require("./addnode");
-var treenodehits=require("./treenodehits");
+var treenodehits=require("ksana-simple-api").treenodehits;
 var defaultstyles={
 	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",background:"highlight",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}

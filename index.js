@@ -51,7 +51,7 @@ var TreeToc=React.createClass({
 		return {editcaption:-1,selected:[]};
 	}
 	,clearHits:function() {
-		for (var i=0;i<this.props.toc;i++) {
+		for (var i=0;i<this.props.toc.length;i++) {
 			if (this.props.toc[i].hit) delete this.props.toc[i].hit;
 		}
 	}

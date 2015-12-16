@@ -137,6 +137,7 @@ var TreeToc=React.createClass({
 				editcaption:this.state.editcaption,
 				deleting:this.state.deleting,
 				selected:this.state.selected,
+				treename:this.props.treename,
 				styles:this.props.styles,
 				adding:this.state.adding,
 				action:this.action,opts:this.props.opts,cur:0,

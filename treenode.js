@@ -125,6 +125,9 @@ var TreeNode=React.createClass({
 	,renderCaption:function(n) {
 		var cur=this.props.toc[n];
 		var stylename="caption";
+		var defaultCaption="";
+		if (n==0) defaultCaption=this.props.treename;
+
 		if (this.props.selected.indexOf(n)>-1) stylename="selectedcaption";
 		var caption=null;
 		if (this.props.deleting===n) {
@@ -136,7 +139,7 @@ var TreeNode=React.createClass({
 				               size:size,ref:"editcaption",defaultValue:cur.t});
 		} else {
 			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave
-				,style:styles[stylename],title:n},cur.t+(cur.o?" ":""));
+				,style:styles[stylename],title:n},(defaultCaption||cur.t)+(cur.o?" ":""));
 			//force caption to repaint by appending extra space at the end
 		}
 		return caption;

@@ -8,7 +8,7 @@ var treenodehits=require("ksana-simple-api").treenodehits;
 var defaultstyles={
 	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",background:"highlight",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}
-	,childnode:{left:"15px",position:"relative"}
+	,childnode:{left:"0.7em",position:"relative",textIndent:"-1.4em"}
 	,rootnode:{position:"relative"}
 	,folderbutton: {cursor:"pointer",borderRadius:"50%"}
 	,closed:{cursor:"pointer",fontSize:"75%"}
@@ -118,7 +118,7 @@ var TreeNode=React.createClass({
 			if (cur.o) folderbutton=E("a",props,"－");//"▼"
 			else       folderbutton=E("a",props,"＋");//"▷"
 		} else {
-			folderbutton=E("a",{ style:styles.hiddenleaf},"　");
+			folderbutton=E("a",{ style:styles.hiddenleaf},"＊");
 		}
 		return folderbutton;
 	}

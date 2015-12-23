@@ -17,7 +17,7 @@ var defaultstyles={
 	,hiddenleaf:{visibility:"hidden"}	
 	,deletebutton:{background:"red",color:"yellow"}
 	,nodelink:{fontSize:"65%",cursor:"pointer"}
-	,hit:{color:"pink",fontSize:"65%",cursor:"pointer"}
+	,hit:{color:"red",fontSize:"65%",cursor:"pointer"}
 	,input:{fontSize:"100%"}
 };
 var styles={};
@@ -175,7 +175,7 @@ var TreeNode=React.createClass({
 	}
 	,renderHit:function(hit,n) {
 		if (!hit) return;
-		return E("span",{onClick:this.clickhit,style:styles.hit,"data-n":n,
+		return E("span",{onClick:this.clickhit,style:styles.hit,"data-n":n,className:"treenode_hit",
 			onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave},hit);
 	}
 	,render:function() {
@@ -199,7 +199,7 @@ var TreeNode=React.createClass({
 		if (this.props.deleting>-1) editcontrols=null;
 		var hits=treenodehits(this.props.toc,this.props.hits,n);
 
-		return E("div",{onClick:this.select,"data-n":n,style:styles[stylename]},
+		return E("div",{onClick:this.select,"data-n":n,style:styles[stylename],className:"treenode_lv"+cur.d},
 
 			   adding_before_controls,
 			   folderbutton,depthdeco,

@@ -38,7 +38,11 @@ var TreeNode=React.createClass({
 		this.cloneStyle();
 	}
 	,click:function(e) {
-		var n=parseInt(e.target.parentElement.attributes['data-n'].value);
+		ele=e.target;
+		while (ele && !ele.attributes['data-n']) {
+			ele=ele.parentElement;
+		}
+		var n=parseInt(ele.attributes['data-n'].value);
 		this.props.toc[n].o=!this.props.toc[n].o;
 		this.forceUpdate();
 		e.preventDefault();
@@ -100,13 +104,13 @@ var TreeNode=React.createClass({
 		e.target.style.background="highlight";
 		e.target.style.oldcolor=e.target.style.color;
 		e.target.style.color="HighlightText";
-		var t=e.target.innerHTML;
-		if (t==="＋"||t==="－") e.target.style.borderRadius="50%";
-		else e.target.style.borderRadius="5px";
+		e.target.style.borderRadius="5px";
+		this.lasttarget=e.target;
 	}
 	,mouseleave:function(e) {
-		e.target.style.background="none";
-		e.target.style.color=e.target.style.oldcolor;
+		if (!this.lasttarget)return;
+		this.lasttarget.style.background="none";
+		this.lasttarget.style.color=this.lasttarget.style.oldcolor;
 	}
 	,renderFolderButton:function(n) {
 		var next=this.props.toc[n+1];
@@ -114,9 +118,9 @@ var TreeNode=React.createClass({
 		var folderbutton=null;
 		var props={style:styles.closed, onClick:this.click, onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave};
 		if (cur.o) props.style=styles.opened;
-		if (next && next.d>cur.d) { 
-			if (cur.o) folderbutton=E("a",props,"－");//"▼"
-			else       folderbutton=E("a",props,"＋");//"▷"
+		if (next && next.d>cur.d && cur.d) { 
+			if (cur.o) folderbutton=E("a",props,this.props.opened||"－");//"▼"
+			else       folderbutton=E("a",props,this.props.closed||"＋");//"▷"
 		} else {
 			folderbutton=E("a",{ style:styles.hiddenleaf},"＊");
 		}
@@ -138,8 +142,10 @@ var TreeNode=React.createClass({
 			caption=E("input",{onKeyDown:this.editingkeydown,style:styles.input,
 				               size:size,ref:"editcaption",defaultValue:cur.t});
 		} else {
+			var t=cur.t;
+			if (t.length<5) t=t+"  ";
 			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave
-				,style:styles[stylename],title:n},(defaultCaption||cur.t)+(cur.o?" ":""));
+				,style:styles[stylename],title:n},(defaultCaption||t)+(cur.o?" ":""));
 			//force caption to repaint by appending extra space at the end
 		}
 		return caption;
@@ -184,6 +190,7 @@ var TreeNode=React.createClass({
 		var cur=this.props.toc[n];
 		var stylename="childnode",children=[];
 		var selected=this.props.selected.indexOf(n)>-1;
+		var nodeicon=renderNodeIcon(cur.d,this.props.nodeicons);
 		var depthdeco=renderDepth(cur.d,this.props.opts)
 		if (cur.d==0) stylename="rootnode";
 		var adding_before_controls=this.renderAddingNode(-n,true);
@@ -197,21 +204,26 @@ var TreeNode=React.createClass({
 		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur,selected,n,this.props.editcaption);
 		if (this.props.deleting>-1) extracomponent=null;
 		if (this.props.deleting>-1) editcontrols=null;
-		var hits=treenodehits(this.props.toc,this.props.hits,n);
+		var hitcount=treenodehits(this.props.toc,this.props.hits,n);
 
 		return E("div",{onClick:this.select,"data-n":n,style:styles[stylename],className:"treenode_lv"+cur.d},
 
 			   adding_before_controls,
-			   folderbutton,depthdeco,
+			   folderbutton,nodeicon,depthdeco,
 			   editcontrols,
 			   caption,
-			   this.renderHit(hits,n),
+			   this.renderHit(hitcount,n),
 			   extracomponent,
 			   adding_after_controls,
 			   children.map(this.renderItem));
 	}
 });
 
+var renderNodeIcon=function(depth,nodeicons) {
+	if (!nodeicons) return;
+	if (!nodeicons[depth]) return nodeicons[nodeicons.length-1];//return last icon
+	return nodeicons[depth];
+}
 var ganzhi="　甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥";
 
 var renderDepth=function(depth,opts) {

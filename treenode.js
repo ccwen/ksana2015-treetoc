@@ -6,7 +6,7 @@ var Controls=require("./controls");
 var AddNode=require("./addnode");
 var treenodehits=require("ksana-simple-api").treenodehits;
 var defaultstyles={
-	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",background:"highlight",borderRadius:"5px"}
+	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",borderRadius:"5px",background:"HighlightText"}
 	,caption:{cursor:"pointer"}
 	,childnode:{left:"0.7em",position:"relative",textIndent:"-1.4em"}
 	,rootnode:{position:"relative"}
@@ -30,6 +30,7 @@ var TreeNode=React.createClass({
 		,selected:React.PropTypes.array         //selected treenode (multiple)
 		,cur:React.PropTypes.number.isRequired //current active treenode
 		,styles:React.PropTypes.object  //custom style
+		,nodeicons:React.PropTypes.node
 	}
 	,getDefaultProps:function() {
 		return {cur:0,opts:{},toc:[]};
@@ -101,7 +102,7 @@ var TreeNode=React.createClass({
 		return out;
 	}
 	,mouseenter:function(e) {
-		e.target.style.background="highlight";
+		//e.target.style.background="highlight";
 		e.target.style.oldcolor=e.target.style.color;
 		e.target.style.color="HighlightText";
 		e.target.style.borderRadius="5px";
@@ -109,7 +110,7 @@ var TreeNode=React.createClass({
 	}
 	,mouseleave:function(e) {
 		if (!this.lasttarget)return;
-		this.lasttarget.style.background="none";
+		//this.lasttarget.style.background="none";
 		this.lasttarget.style.color=this.lasttarget.style.oldcolor;
 	}
 	,renderFolderButton:function(n) {
@@ -126,7 +127,7 @@ var TreeNode=React.createClass({
 		}
 		return folderbutton;
 	}
-	,renderCaption:function(n) {
+	,renderCaption:function(n,depth) {
 		var cur=this.props.toc[n];
 		var stylename="caption";
 		var defaultCaption="";
@@ -144,8 +145,16 @@ var TreeNode=React.createClass({
 		} else {
 			var t=cur.t;
 			if (t.length<5) t=t+"  ";
+			var style=JSON.parse(JSON.stringify(styles[stylename]));
+
+			if (this.props.nodeicons) {
+				var nodeicon=getNodeIcon(depth,this.props.nodeicons);
+				if (typeof nodeicon=="string") style.backgroundImage="url("+nodeicon+")";
+				style.backgroundRepeat='no-repeat'
+			}
+
 			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave
-				,style:styles[stylename],title:n},(defaultCaption||t)+(cur.o?" ":""));
+				,style:style,title:n},(defaultCaption||t)+(cur.o?" ":""));
 			//force caption to repaint by appending extra space at the end
 		}
 		return caption;
@@ -190,14 +199,18 @@ var TreeNode=React.createClass({
 		var cur=this.props.toc[n];
 		var stylename="childnode",children=[];
 		var selected=this.props.selected.indexOf(n)>-1;
-		var nodeicon=renderNodeIcon(cur.d,this.props.nodeicons);
+		var nodeicon="";
+		if (this.props.nodeicons&&typeof this.props.nodeicons[0]!=="string"){
+			var nodeicon=getNodeIcon(cur.d,this.props.nodeicons);	
+		}
+		
 		var depthdeco=renderDepth(cur.d,this.props.opts)
 		if (cur.d==0) stylename="rootnode";
 		var adding_before_controls=this.renderAddingNode(-n,true);
 		var adding_after_controls=this.renderAddingNode(n);
 		var editcontrols=this.renderEditControls(n);
 		var folderbutton=this.renderFolderButton(n);
-		var caption=this.renderCaption(n);
+		var caption=this.renderCaption(n,cur.d);
 
 		if (cur.o) children=enumChildren(this.props.toc,n);
 
@@ -219,7 +232,7 @@ var TreeNode=React.createClass({
 	}
 });
 
-var renderNodeIcon=function(depth,nodeicons) {
+var getNodeIcon=function(depth,nodeicons) {
 	if (!nodeicons) return;
 	if (!nodeicons[depth]) return nodeicons[nodeicons.length-1];//return last icon
 	return nodeicons[depth];

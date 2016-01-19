@@ -6,7 +6,7 @@ var Controls=require("./controls");
 var AddNode=require("./addnode");
 var treenodehits=require("ksana-simple-api").treenodehits;
 var defaultstyles={
-	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",borderRadius:"5px",background:"HighlightText"}
+	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}
 	,childnode:{left:"0.7em",position:"relative",textIndent:"-1.4em"}
 	,rootnode:{position:"relative"}
@@ -104,7 +104,7 @@ var TreeNode=React.createClass({
 	,mouseenter:function(e) {
 		//e.target.style.background="highlight";
 		e.target.style.oldcolor=e.target.style.color;
-		e.target.style.color="HighlightText";
+		//e.target.style.color="HighlightText";
 		e.target.style.borderRadius="5px";
 		this.lasttarget=e.target;
 	}

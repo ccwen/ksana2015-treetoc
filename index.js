@@ -142,6 +142,7 @@ var TreeToc=React.createClass({
 				adding:this.state.adding,
 				opened:this.props.opened,
 				closed:this.props.closed,
+				captionClass:this.props.captionClass,
 				nodeicons:this.props.nodeicons,
 				action:this.action,opts:this.props.opts,cur:0,
 				hits:this.props.hits}));

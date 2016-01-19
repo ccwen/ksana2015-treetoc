@@ -153,8 +153,8 @@ var TreeNode=React.createClass({
 				style.backgroundRepeat='no-repeat'
 			}
 
-			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave
-				,style:style,title:n},(defaultCaption||t)+(cur.o?" ":""));
+			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave,
+				className:this.props.captionClass,style:style,title:n},(defaultCaption||t)+(cur.o?" ":""));
 			//force caption to repaint by appending extra space at the end
 		}
 		return caption;

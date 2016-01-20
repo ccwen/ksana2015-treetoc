@@ -8,7 +8,7 @@ var treenodehits=require("ksana-simple-api").treenodehits;
 var defaultstyles={
 	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}
-	,childnode:{left:"0.7em",position:"relative",textIndent:"-1.4em"}
+	,childnode:{left:"0.7em",position:"relative"}
 	,rootnode:{position:"relative"}
 	,folderbutton: {cursor:"pointer",borderRadius:"50%"}
 	,closed:{cursor:"pointer",fontSize:"75%"}
@@ -150,7 +150,7 @@ var TreeNode=React.createClass({
 			if (this.props.nodeicons) {
 				var nodeicon=getNodeIcon(depth,this.props.nodeicons);
 				if (typeof nodeicon=="string") style.backgroundImage="url("+nodeicon+")";
-				style.backgroundRepeat='no-repeat'
+				style.backgroundRepeat="no-repeat";
 			}
 
 			caption=E("span",{onMouseEnter:this.mouseenter,onMouseLeave:this.mouseleave,

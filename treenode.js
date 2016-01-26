@@ -131,6 +131,8 @@ var TreeNode=React.createClass({
 		var cur=this.props.toc[n];
 		var stylename="caption";
 		var defaultCaption="";
+		var t=cur.t;
+		if (this.props.conv) t=this.props.conv(t)||t;
 		if (n==0) defaultCaption=this.props.treename;
 
 		if (this.props.selected.indexOf(n)>-1) stylename="selectedcaption";
@@ -141,9 +143,8 @@ var TreeNode=React.createClass({
 			var size=cur.t.length+2;
 			if (size<5) size=5;
 			caption=E("input",{onKeyDown:this.editingkeydown,style:styles.input,
-				               size:size,ref:"editcaption",defaultValue:cur.t});
+				               size:size,ref:"editcaption",defaultValue:t});
 		} else {
-			var t=cur.t;
 			if (t.length<5) t=t+"  ";
 			var style=JSON.parse(JSON.stringify(styles[stylename]));
 

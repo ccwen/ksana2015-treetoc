@@ -46,6 +46,7 @@ var TreeToc=React.createClass({
 		,onSelect:React.PropTypes.func  //user select a treenode
 		,tocid:React.PropTypes.string  //toc view 
 		,styles:React.PropTypes.object //custom styles
+		,conv:React.PropTypes.func //custom converter for each item
 	}
 	,getInitialState:function(){
 		return {editcaption:-1,selected:[]};
@@ -145,7 +146,9 @@ var TreeToc=React.createClass({
 				captionClass:this.props.captionClass,
 				nodeicons:this.props.nodeicons,
 				action:this.action,opts:this.props.opts,cur:0,
-				hits:this.props.hits}));
+				hits:this.props.hits,
+				conv:this.props.conv
+			}));
 	}
 })
 module.exports={Component:TreeToc,genToc:genToc,buildToc:buildToc};

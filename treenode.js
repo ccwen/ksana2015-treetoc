@@ -4,7 +4,14 @@ var E=React.createElement;
 var manipulate=require("./manipulate");
 var Controls=require("./controls");
 var AddNode=require("./addnode");
-var treenodehits=require("ksana-simple-api").treenodehits;
+var treenodehits=null;
+try {
+	treenodehits=require("ksana-simple-api").treenodehits;
+} catch(e) {
+	//don't have ksana libray
+	treenodehits=function(){return 0};
+}
+
 var defaultstyles={
 	selectedcaption:{borderBottom:"1px solid blue",cursor:"pointer",borderRadius:"5px"}
 	,caption:{cursor:"pointer"}

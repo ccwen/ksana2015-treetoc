@@ -32,7 +32,7 @@ var buildToc = function(toc) {
 	return toc;
 }
 var genToc=function(toc,title) {
-    var out=[{depth:0,text:title||ksana.js.title}];
+    var out=[{d:0,t:title||ksana.js.title}];
     if (toc.texts) for (var i=0;i<toc.texts.length;i++) {
       out.push({t:toc.texts[i],d:toc.depths[i], vpos:toc.vpos[i]});
     }

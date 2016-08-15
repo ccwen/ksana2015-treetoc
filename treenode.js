@@ -232,6 +232,11 @@ var TreeNode=React.createClass({
 			s=JSON.parse(JSON.stringify(styles[stylename]));
 			s.left="";//no ident
 			var angle=(cur.d+1)*30;
+			if (cur.f) {
+				s.fontFamily=cur.f;
+			} else {
+				s.fontFamily=this.props.opts.font||"system";
+			}
 			s.background="hsl("+angle+",40%,50%)";
 		}
 

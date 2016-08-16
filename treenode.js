@@ -63,8 +63,13 @@ var TreeNode=React.createClass({
 		if (!datan) return;
 		var n=parseInt(datan.value);
 		var selected=this.props.selected.indexOf(n)>-1;
-		if (selected && this.props.opts.editable) {
-			this.props.action("editcaption",n);
+		if (selected) {
+			if (this.props.opts.editable)  {
+				this.props.action("editcaption",n);	
+			} else {
+				//toggle folder button
+				this.click(e);
+			}
 		} else {
 			this.props.action("select",n,e.ctrlKey);
 		}

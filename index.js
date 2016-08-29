@@ -10,7 +10,8 @@ var React=require("react");
 var TreeNode=require("./treenode");
 var E=React.createElement;
 var manipulate=require("./manipulate");
-
+var PT=React.PropTypes;
+var util=require("./util");
 var buildToc = function(toc) {
 	if (!toc || !toc.length || toc.built) return;
 	var depths=[];
@@ -41,15 +42,17 @@ var genToc=function(toc,title) {
 
 var TreeToc=React.createClass({
 	propTypes:{
-		toc:React.PropTypes.array.isRequired  //core toc dataset
-		,opts:React.PropTypes.object    
-		,onSelect:React.PropTypes.func  //user select a treenode
-		,tocid:React.PropTypes.string  //toc view 
-		,styles:React.PropTypes.object //custom styles
-		,conv:React.PropTypes.func //custom converter for each item
+		toc:PT.array.isRequired  //core toc dataset
+		,opts:PT.object    
+		,onSelect:PT.func  //user select a treenode
+		,tocid:PT.string  //toc view 
+		,styles:PT.object //custom styles
+		,conv:PT.func //custom converter for each item
+		,scrollTo:PT.number
+		,onScrollTop:PT.func //callback for scrollTo
 	}
 	,getInitialState:function(){
-		return {editcaption:-1,selected:[]};
+		return {editcaption:-1,selected:[],scrollTo:this.props.scrollTo};
 	}
 	,clearHits:function() {
 		for (var i=0;i<this.props.toc.length;i++) {
@@ -58,6 +61,26 @@ var TreeToc=React.createClass({
 	}
 	,componentDidMount:function() {
 		buildToc(this.props.toc);
+		this.openAncestor();
+	}
+	,componentDidUpdate:function(){
+		if (this.scrollingTo) {
+			var n=document.querySelector('[data-n="'+this.scrollingTo+'"');
+			if (n&&this.props.onScrollTop) {
+				this.props.onScrollTop(n.getBoundingClientRect().top);
+			}
+		}
+	}
+	,openAncestor:function(toc,scrollTo){
+		toc=toc||this.props.toc;
+		scrollTo=scrollTo||this.props.scrollTo;
+
+		if (scrollTo==-1) return;
+		var ans=util.enumAncestors(toc,scrollTo);
+		ans.forEach(function(a){
+			toc[a].o=true;
+		});
+		this.scrollingTo=scrollTo;
 	}
 	,componentWillReceiveProps:function(nextProps) {
 		if (nextProps.toc && !nextProps.toc.built) {
@@ -65,6 +88,10 @@ var TreeToc=React.createClass({
 		}
 		if (nextProps.hits!==this.props.hits) {
 			this.clearHits();
+		}
+		this.openAncestor(nextProps.toc,nextProps.scrollTo);
+		if (nextProps.scrollTo>-1) {
+			this.setState({selected:[nextProps.scrollTo]});
 		}
 		this.action("updateall");
 	}
@@ -134,7 +161,7 @@ var TreeToc=React.createClass({
 	}
 	,render:function() {
 		return E("div",{},
-			E(TreeNode,{toc:this.props.toc,
+			E(TreeNode,{ref:"tree",toc:this.props.toc,
 				editcaption:this.state.editcaption,
 				deleting:this.state.deleting,
 				selected:this.state.selected,

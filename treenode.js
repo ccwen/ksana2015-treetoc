@@ -4,7 +4,9 @@ var E=React.createElement;
 var manipulate=require("./manipulate");
 var Controls=require("./controls");
 var AddNode=require("./addnode");
+var util=require("./util");
 var treenodehits=null;
+var PT=React.PropTypes;
 
 try {
 	treenodehits=require("ksana-simple-api").treenodehits;
@@ -32,13 +34,13 @@ var styles={};
 
 var TreeNode=React.createClass({
 	propTypes:{
-		toc:React.PropTypes.array.isRequired
-		,opts:React.PropTypes.object
-		,action:React.PropTypes.func.isRequired 
-		,selected:React.PropTypes.array         //selected treenode (multiple)
-		,cur:React.PropTypes.number.isRequired //current active treenode
-		,styles:React.PropTypes.object  //custom style
-		,nodeicons:React.PropTypes.node
+		toc:PT.array.isRequired
+		,opts:PT.object
+		,action:PT.func.isRequired 
+		,selected:PT.array         //selected treenode (multiple)
+		,cur:PT.number.isRequired //current active treenode
+		,styles:PT.object  //custom style
+		,nodeicons:PT.node
 	}
 	,getDefaultProps:function() {
 		return {cur:0,opts:{},toc:[]};
@@ -81,7 +83,6 @@ var TreeNode=React.createClass({
 		for (var i in defaultstyles) styles[i]=defaultstyles[i];
 		if (newstyles) for (var i in newstyles) styles[i]=newstyles[i];
 	}
-
 	,componentWillReceiveProps:function(nextProps) {
 		if (nextProps.styles && nextProps.styles!==this.props.styles) this.cloneStyle(nextProps.styles)
 	}
@@ -226,7 +227,7 @@ var TreeNode=React.createClass({
 		var folderbutton=this.renderFolderButton(n);
 		var caption=this.renderCaption(n,cur.d);
 
-		if (cur.o) children=enumChildren(this.props.toc,n);
+		if (cur.o) children=util.enumChildren(this.props.toc,n);
 
 		var extracomponent=this.props.opts.onNode&& this.props.opts.onNode(cur,selected,n,this.props.editcaption);
 		if (this.props.deleting>-1) extracomponent=null;
@@ -277,29 +278,4 @@ var renderDepth=function(depth,opts) {
 };
 
 
-var enumChildren=function(toc,cur) {
-    var children=[];
-    if (!toc || !toc.length || toc.length==1) return children;
-    thisdepth=toc[cur].d||toc[cur].depth;
-    if (cur==0) thisdepth=0;
-    if (cur+1>=toc.length) return children;
-    if ((toc[cur+1].d||toc[cur+1].depth)!= 1+thisdepth) {
-    	return children;  // no children node
-    }
-    var n=cur+1;
-    var child=toc[n];
-    
-    while (child) {
-      children.push(n);
-      var next=toc[n+1];
-      if (!next) break;
-      if ((next.d||next.depth)==(child.d||child.depth)) {
-        n++;
-      } else if ((next.d||next.depth)>(child.d||child.depth)) {
-        n=child.n||child.next;
-      } else break;
-      if (n) child=toc[n];else break;
-    }
-    return children;
-}
 module.exports=TreeNode;

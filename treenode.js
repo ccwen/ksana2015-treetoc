@@ -9,7 +9,7 @@ var treenodehits=null;
 var PT=React.PropTypes;
 
 try {
-	treenodehits=require("ksana-simple-api").treenodehits;
+	treenodehits=require("ksana-simple-api/treenodehits");
 } catch(e) {
 	//don't have ksana libray
 	treenodehits=function(){return 0};
